@@ -70,32 +70,24 @@ func GeneratePrivateKey() (*rsa.PrivateKey, error) {
 	return privateKey, nil
 }
 
-func GetPublicKey(encodedPrivateKey *rsa.PrivateKey) *rsa.PublicKey {
-	return &encodedPrivateKey.PublicKey
+func GetPublicKey(decodedPrivateKey *rsa.PrivateKey) *rsa.PublicKey {
+	return &decodedPrivateKey.PublicKey
 }
 
-func ReadPrivateKeyFromFile(filepath string) (*rsa.PrivateKey, error) {
+func ReadPrivateKeyFromFile(filepath string) ([]byte, error) {
 	encodedPrivateKey, err := ioutil.ReadFile(filepath)
 	if err != nil {
 		return nil, err
 	}
-	decodedPrivateKey, err := DecodePrivateKey(encodedPrivateKey)
-	if err != nil {
-		return nil, err
-	}
-	return decodedPrivateKey, nil
+	return encodedPrivateKey, nil
 }
 
-func ReadPublicKeyFromFile(filepath string) (*rsa.PublicKey, error) {
+func ReadPublicKeyFromFile(filepath string) ([]byte, error) {
 	encodedPublicKey, err := ioutil.ReadFile(filepath)
 	if err != nil {
 		return nil, err
 	}
-	decodedPublicKey, err := DecodePublicKey(encodedPublicKey)
-	if err != nil {
-		return nil, err
-	}
-	return decodedPublicKey, nil
+	return encodedPublicKey, nil
 }
 
 func WritePrivateKeyToFile(filepath string, encodedPrivateKey []byte) error {

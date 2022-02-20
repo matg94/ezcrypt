@@ -1,15 +1,17 @@
 package ezcrypt
 
-func TestVerifySignature() {}
+import "testing"
 
-func TestGenerateSignature() {}
+func TestVerifySignature(t *testing.T) {}
 
-func TestEncryptFile() {}
+func TestGenerateSignature(t *testing.T) {}
 
-func TestGenerateSignatureToFile() {}
+func TestEncryptFile(t *testing.T) {}
 
-func TestVerifyFileSignature() {}
+func TestGenerateSignatureToFile(t *testing.T) {}
 
-func TestEncrypt() {}
+func TestVerifyFileSignature(t *testing.T) {}
 
-func TestDecrypt() {}
+func TestEncrypt(t *testing.T) {}
+
+func TestDecrypt(t *testing.T) {}
