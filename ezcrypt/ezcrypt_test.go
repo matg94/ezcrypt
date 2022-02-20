@@ -6,9 +6,33 @@ import (
 	"testing"
 )
 
-func TestVerifySignature(t *testing.T) {}
+func TestGenerateAndVerifySignature(t *testing.T) {
+	privateKey, _ := GeneratePrivateKey()
+	messageToSign := "test-signature-message"
 
-func TestGenerateSignature(t *testing.T) {}
+	signature, err := GenerateSignature(privateKey, messageToSign)
+
+	if err != nil {
+		t.Logf("expected sign err to be <nil> but got %v", err)
+		t.Fail()
+	}
+
+	if signature == "" {
+		t.Logf("expected signature to have content")
+		t.Fail()
+	}
+
+	valid, err := VerifySignature(&privateKey.PublicKey, messageToSign, signature)
+
+	if err != nil {
+		t.Logf("expected verify signature err to be <nil> but got %v", err)
+		t.Fail()
+	}
+	if !valid {
+		t.Logf("expected signature to be valid")
+		t.Fail()
+	}
+}
 
 func TestGenerateSignatureToFile(t *testing.T) {}
 

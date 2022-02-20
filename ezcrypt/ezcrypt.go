@@ -1,6 +1,7 @@
 package ezcrypt
 
 import (
+	"crypto"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/sha256"
@@ -11,13 +12,48 @@ import (
 	"strings"
 )
 
-func VerifySignature() {}
+func VerifySignature(publicKey *rsa.PublicKey, message, signature string) (bool, error) {
+	messageHash := sha256.New()
+	_, err := messageHash.Write([]byte(message))
+	if err != nil {
+		return false, err
+	}
+	messageHashSum := messageHash.Sum(nil)
 
-func GenerateSignature() {}
+	if err != nil {
+		return false, err
+	}
+
+	decodedSignature, err := base64.StdEncoding.DecodeString(signature)
+
+	if err != nil {
+		return false, err
+	}
+
+	err = rsa.VerifyPKCS1v15(publicKey, crypto.SHA256, messageHashSum, decodedSignature)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
+func GenerateSignature(privateKey *rsa.PrivateKey, cipher string) (string, error) {
+	messageHash := sha256.New()
+	_, err := messageHash.Write([]byte(cipher))
+	if err != nil {
+		return "", err
+	}
+	messageHashSum := messageHash.Sum(nil)
+	signature, err := rsa.SignPKCS1v15(rand.Reader, privateKey, crypto.SHA256, messageHashSum)
+	if err != nil {
+		return "", err
+	}
+	return base64.StdEncoding.EncodeToString(signature), nil
+}
 
 func GenerateSignatureToFile() {}
 
-func VerifyFileSignature() {}
+func VerifySignatureFromFile() {}
 
 func EncryptFile(publicKey *rsa.PublicKey, filepath string) error {
 	plainTextFile, err := os.ReadFile(filepath)
