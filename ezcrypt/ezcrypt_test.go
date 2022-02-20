@@ -34,10 +34,6 @@ func TestGenerateAndVerifySignature(t *testing.T) {
 	}
 }
 
-func TestGenerateSignatureToFile(t *testing.T) {}
-
-func TestVerifyFileSignature(t *testing.T) {}
-
 func TestEncryptAndDecryptFile(t *testing.T) {
 	privateKey, _ := GeneratePrivateKey()
 	publicKey := GetPublicKey(privateKey)

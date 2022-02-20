@@ -6,7 +6,6 @@ import (
 	"crypto/rsa"
 	"crypto/sha256"
 	"encoding/base64"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -50,10 +49,6 @@ func GenerateSignature(privateKey *rsa.PrivateKey, cipher string) (string, error
 	}
 	return base64.StdEncoding.EncodeToString(signature), nil
 }
-
-func GenerateSignatureToFile() {}
-
-func VerifySignatureFromFile() {}
 
 func EncryptFile(publicKey *rsa.PublicKey, filepath string) error {
 	plainTextFile, err := os.ReadFile(filepath)
@@ -104,7 +99,7 @@ func Encrypt(publicKey *rsa.PublicKey, plaintext string) (string, error) {
 func Decrypt(privateKey *rsa.PrivateKey, cipher string) (string, error) {
 	ciphertext, err := base64.StdEncoding.DecodeString(cipher)
 	if err != nil {
-		fmt.Println("Failed to base64 decode", err)
+		return "", err
 	}
 
 	label := []byte("OAEP Encrypted")
