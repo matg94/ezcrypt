@@ -8,8 +8,21 @@ import (
 	"encoding/base64"
 	"io/ioutil"
 	"os"
-	"strings"
 )
+
+func GenerateSignatureForFile(privateKey *rsa.PrivateKey, filepath string) (string, error) {
+	fileContent, err := os.ReadFile(filepath)
+	if err != nil {
+		return "", err
+	}
+
+	signature, err := GenerateSignature(privateKey, string(fileContent))
+	if err != nil {
+		return "", err
+	}
+
+	return signature, nil
+}
 
 func VerifySignature(publicKey *rsa.PublicKey, message, signature string) (bool, error) {
 	messageHash := sha256.New()
@@ -50,8 +63,8 @@ func GenerateSignature(privateKey *rsa.PrivateKey, cipher string) (string, error
 	return base64.StdEncoding.EncodeToString(signature), nil
 }
 
-func EncryptFile(publicKey *rsa.PublicKey, filepath string) error {
-	plainTextFile, err := os.ReadFile(filepath)
+func EncryptFile(publicKey *rsa.PublicKey, originalFilePath, destinationFilePath string) error {
+	plainTextFile, err := os.ReadFile(originalFilePath)
 	if err != nil {
 		return err
 	}
@@ -60,14 +73,14 @@ func EncryptFile(publicKey *rsa.PublicKey, filepath string) error {
 	if err != nil {
 		return err
 	}
-	err = ioutil.WriteFile(filepath+".ezcrypt", []byte(cipherTextFile), 0644)
+	err = ioutil.WriteFile(destinationFilePath, []byte(cipherTextFile), 0644)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func DecryptFile(privateKey *rsa.PrivateKey, filepath string) error {
+func DecryptFile(privateKey *rsa.PrivateKey, filepath, destinationFilePath string) error {
 	cipherTextFile, err := os.ReadFile(filepath)
 	if err != nil {
 		return err
@@ -77,9 +90,8 @@ func DecryptFile(privateKey *rsa.PrivateKey, filepath string) error {
 	if err != nil {
 		return err
 	}
-	filePathSplit := strings.Split(filepath, ".")
-	newFilePath := strings.Join(filePathSplit[:len(filePathSplit)-1], ".")
-	err = ioutil.WriteFile(newFilePath, []byte(plainTextFile), 0644)
+
+	err = ioutil.WriteFile(destinationFilePath, []byte(plainTextFile), 0644)
 	if err != nil {
 		return err
 	}

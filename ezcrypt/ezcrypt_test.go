@@ -6,6 +6,36 @@ import (
 	"testing"
 )
 
+func TestGenerateSignatureForFile(t *testing.T) {
+	ioutil.WriteFile("./testFile.txt", []byte("test-content"), 0644)
+	fileContent, _ := os.ReadFile("./testFile.txt")
+
+	privateKey, _ := GeneratePrivateKey()
+
+	signature, err := GenerateSignature(privateKey, string(fileContent))
+	if err != nil {
+		t.Logf("expected sign err to be <nil> but got %v", err)
+		t.Fail()
+	}
+
+	if signature == "" {
+		t.Logf("expected signature to have content")
+		t.Fail()
+	}
+
+	valid, err := VerifySignature(&privateKey.PublicKey, string(fileContent), signature)
+
+	if err != nil {
+		t.Logf("expected verify signature err to be <nil> but got %v", err)
+		t.Fail()
+	}
+	if !valid {
+		t.Logf("expected signature to be valid")
+		t.Fail()
+	}
+	cleanUpFile(t, "./testFile.txt")
+}
+
 func TestGenerateAndVerifySignature(t *testing.T) {
 	privateKey, _ := GeneratePrivateKey()
 	messageToSign := "test-signature-message"
@@ -41,7 +71,7 @@ func TestEncryptAndDecryptFile(t *testing.T) {
 
 	ioutil.WriteFile("./testFile.txt", []byte(testEncryptionContent), 0644)
 
-	err := EncryptFile(publicKey, "./testFile.txt")
+	err := EncryptFile(publicKey, "./testFile.txt", "./testFile.txt.ezcrypt")
 	if err != nil {
 		t.Logf("expected encrypt file err to be <nil> but got %v", err)
 		t.Fail()
@@ -61,7 +91,7 @@ func TestEncryptAndDecryptFile(t *testing.T) {
 
 	cleanUpFile(t, "./testFile.txt")
 
-	err = DecryptFile(privateKey, "./testFile.txt.ezcrypt")
+	err = DecryptFile(privateKey, "./testFile.txt.ezcrypt", "./testFile.txt")
 	if err != nil {
 		t.Logf("expected decrypt file err to be <nil> but got %v", err)
 		t.Fail()
