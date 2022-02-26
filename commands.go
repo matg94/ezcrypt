@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 
@@ -30,10 +31,12 @@ func CheckForExistenceOfFile(files ...string) ([]string, error) {
 }
 
 func output(values ...string) {
-	fmt.Print(values)
+	for _, val := range values {
+		fmt.Print(val)
+	}
 }
 
-func EncryptAction(flags *Flags) {
+func EncryptAction(flags *Flags, standardIn string) {
 	encodedPublicKey, err := ezcrypt.ReadPublicKeyFromFile(flags.PublicKey)
 	HandleError(err)
 	decodedPublicKey, err := ezcrypt.DecodePublicKey(encodedPublicKey)
@@ -48,10 +51,44 @@ func EncryptAction(flags *Flags) {
 			HandleError(err)
 			output(cipher)
 		}
+	} else if standardIn != "" {
+		cipher, err := ezcrypt.Encrypt(decodedPublicKey, standardIn)
+		HandleError(err)
+		if flags.Target != "" {
+			err = ioutil.WriteFile(flags.Target, []byte(cipher), 0644)
+			HandleError(err)
+		} else {
+			output(cipher)
+		}
 	}
 }
 
-func DecryptAction(flags *Flags) {}
+func DecryptAction(flags *Flags, standardIn string) {
+	encodedPrivateKey, err := ezcrypt.ReadPrivateKeyFromFile(flags.PrivateKey)
+	HandleError(err)
+	decodedPrivateKey, err := ezcrypt.DecodePrivateKey(encodedPrivateKey)
+	HandleError(err)
+	if flags.FilePath != "" {
+		if flags.Target != "" {
+			ezcrypt.DecryptFile(decodedPrivateKey, flags.FilePath, flags.Target)
+		} else {
+			cipherTextFile, err := os.ReadFile(flags.FilePath)
+			HandleError(err)
+			plaintext, err := ezcrypt.Decrypt(decodedPrivateKey, string(cipherTextFile))
+			HandleError(err)
+			output(plaintext)
+		}
+	} else if standardIn != "" {
+		plaintext, err := ezcrypt.Decrypt(decodedPrivateKey, standardIn)
+		HandleError(err)
+		if flags.Target != "" {
+			err = ioutil.WriteFile(flags.Target, []byte(plaintext), 0644)
+			HandleError(err)
+		} else {
+			output(plaintext)
+		}
+	}
+}
 
 func GenerateAction(flags *Flags) {
 	privateKey, err := ezcrypt.GeneratePrivateKey()
@@ -72,12 +109,14 @@ func GenerateAction(flags *Flags) {
 	HandleError(err)
 }
 
-func SignAction(flags *Flags) {}
+func SignAction(flags *Flags, standardIn string) {}
 
-func VerifyAction(flags *Flags) {}
+func VerifyAction(flags *Flags, standardIn string) {}
 
 /*
 
 -t needs to work as a pipe for both string and file encryption
+
+TODO: Add ability to use passwords on private keys
 
 */

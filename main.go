@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"flag"
-	"fmt"
 	"log"
 	"os"
 )
@@ -57,17 +56,17 @@ func readStandardIn() string {
 	return finalString
 }
 
-func executeAction(actions *Action, flags *Flags) {
+func executeAction(actions *Action, flags *Flags, standardIn string) {
 	if actions.Encrypt {
-		EncryptAction(flags)
+		EncryptAction(flags, standardIn)
 	} else if actions.Decrypt {
-		DecryptAction(flags)
+		DecryptAction(flags, standardIn)
 	} else if actions.Generate {
 		GenerateAction(flags)
 	} else if actions.Sign {
-		SignAction(flags)
+		SignAction(flags, standardIn)
 	} else if actions.Verify {
-		VerifyAction(flags)
+		VerifyAction(flags, standardIn)
 	} else {
 		log.Fatal("could not find an action to execute")
 	}
@@ -79,7 +78,6 @@ func main() {
 	if hasStandardInput() {
 		standardInput = readStandardIn()
 	}
-	fmt.Print(standardInput)
 
 	flags := &Flags{}
 	actions := &Action{}
@@ -101,6 +99,6 @@ func main() {
 		log.Fatal("exactly one action flag required but received either zero or multiple")
 	}
 
-	executeAction(actions, flags)
+	executeAction(actions, flags, standardInput)
 
 }
