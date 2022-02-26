@@ -109,14 +109,57 @@ func GenerateAction(flags *Flags) {
 	HandleError(err)
 }
 
-func SignAction(flags *Flags, standardIn string) {}
+func SignAction(flags *Flags, standardIn string) {
+	encodedPrivateKey, err := ezcrypt.ReadPrivateKeyFromFile(flags.PrivateKey)
+	HandleError(err)
+	decodedPrivateKey, err := ezcrypt.DecodePrivateKey(encodedPrivateKey)
+	HandleError(err)
+	if flags.FilePath != "" {
+		signature, err := ezcrypt.GenerateSignatureForFile(decodedPrivateKey, flags.FilePath)
+		HandleError(err)
+		if flags.Target != "" {
+			err = ioutil.WriteFile(flags.Target, []byte(signature), 0644)
+			HandleError(err)
+		} else {
+			output(signature)
+		}
+	} else if standardIn != "" {
+		signature, err := ezcrypt.GenerateSignature(decodedPrivateKey, standardIn)
+		HandleError(err)
+		if flags.Target != "" {
+			err = ioutil.WriteFile(flags.Target, []byte(signature), 0644)
+			HandleError(err)
+		} else {
+			output(signature)
+		}
+	}
+}
 
-func VerifyAction(flags *Flags, standardIn string) {}
+func VerifyAction(flags *Flags, standardIn string) {
+	if flags.SignatureFilePath == "" {
+		HandleError(fmt.Errorf("-s file path is not set: this needs to point to a signature file"))
+		return
+	}
+	signature, err := os.ReadFile(flags.SignatureFilePath)
+	HandleError(err)
+	encodedPublicKey, err := ezcrypt.ReadPublicKeyFromFile(flags.PublicKey)
+	HandleError(err)
+	decodedPublicKey, err := ezcrypt.DecodePublicKey(encodedPublicKey)
+	HandleError(err)
+	verified := false
+	if flags.FilePath != "" {
+		signedBody, err := os.ReadFile(flags.FilePath)
+		HandleError(err)
+		verified, err = ezcrypt.VerifySignature(decodedPublicKey, string(signedBody), string(signature))
+		HandleError(err)
+	} else {
+		verified, err = ezcrypt.VerifySignature(decodedPublicKey, standardIn, string(signature))
+		HandleError(err)
+	}
+	if verified {
+		fmt.Print("valid")
+		return
+	}
+	fmt.Print("invalid")
 
-/*
-
--t needs to work as a pipe for both string and file encryption
-
-TODO: Add ability to use passwords on private keys
-
-*/
+}

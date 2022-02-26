@@ -16,10 +16,11 @@ type Action struct {
 }
 
 type Flags struct {
-	PublicKey  string
-	PrivateKey string
-	FilePath   string
-	Target     string
+	PublicKey         string
+	PrivateKey        string
+	FilePath          string
+	Target            string
+	SignatureFilePath string
 }
 
 func checkOneActionFlag(bools ...bool) bool {
@@ -86,6 +87,7 @@ func main() {
 	flag.StringVar(&flags.PrivateKey, "privkey", "./privateKey.pem", "Path to private key the default is ~/.ezcrypt/privateKey.pem. This path is relative to ~/.ezcrypt")
 	flag.StringVar(&flags.FilePath, "f", "", "Path to file to encrypt/decrypt, if not specified, piped string input will be encrypted")
 	flag.StringVar(&flags.Target, "t", "", "If specified, ezcrypt will create and overwrite a file at this path with its output")
+	flag.StringVar(&flags.SignatureFilePath, "s", "", "The filepath pointing to the signature file when verifying a signature")
 
 	flag.BoolVar(&actions.Encrypt, "enc", false, "Encrypt action mutually exclusive with other actions")
 	flag.BoolVar(&actions.Decrypt, "dec", false, "Decrypt action mutually exclusive with other actions")

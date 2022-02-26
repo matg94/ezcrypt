@@ -44,7 +44,7 @@ func VerifySignature(publicKey *rsa.PublicKey, message, signature string) (bool,
 
 	err = rsa.VerifyPKCS1v15(publicKey, crypto.SHA256, messageHashSum, decodedSignature)
 	if err != nil {
-		return false, err
+		return false, nil
 	}
 	return true, nil
 }
