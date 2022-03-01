@@ -30,12 +30,6 @@ func CheckForExistenceOfFile(files ...string) ([]string, error) {
 	return existingFiles, nil
 }
 
-func output(values ...string) {
-	for _, val := range values {
-		fmt.Print(val)
-	}
-}
-
 func EncryptAction(flags *Flags, standardIn string) {
 	encodedPublicKey, err := ezcrypt.ReadPublicKeyFromFile(flags.PublicKey)
 	HandleError(err)
@@ -157,9 +151,8 @@ func VerifyAction(flags *Flags, standardIn string) {
 		HandleError(err)
 	}
 	if verified {
-		fmt.Print("valid")
+		output("valid")
 		return
 	}
-	fmt.Print("invalid")
-
+	output("invalid")
 }

@@ -8,11 +8,10 @@ import (
 
 func TestGenerateSignatureForFile(t *testing.T) {
 	ioutil.WriteFile("./testFile.txt", []byte("test-content"), 0644)
-	fileContent, _ := os.ReadFile("./testFile.txt")
 
 	privateKey, _ := GeneratePrivateKey()
 
-	signature, err := GenerateSignature(privateKey, string(fileContent))
+	signature, err := GenerateSignatureForFile(privateKey, "./testFile.txt")
 	if err != nil {
 		t.Logf("expected sign err to be <nil> but got %v", err)
 		t.Fail()
@@ -23,7 +22,8 @@ func TestGenerateSignatureForFile(t *testing.T) {
 		t.Fail()
 	}
 
-	valid, err := VerifySignature(&privateKey.PublicKey, string(fileContent), signature)
+	signedBody, _ := os.ReadFile("./testFile.txt")
+	valid, err := VerifySignature(&privateKey.PublicKey, string(signedBody), signature)
 
 	if err != nil {
 		t.Logf("expected verify signature err to be <nil> but got %v", err)

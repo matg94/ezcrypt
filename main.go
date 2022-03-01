@@ -3,6 +3,8 @@ package main
 import (
 	"bufio"
 	"flag"
+	"fmt"
+	"io"
 	"log"
 	"os"
 )
@@ -21,6 +23,14 @@ type Flags struct {
 	FilePath          string
 	Target            string
 	SignatureFilePath string
+}
+
+var out io.Writer = os.Stdout
+
+func output(values ...string) {
+	for _, val := range values {
+		fmt.Fprint(out, val)
+	}
 }
 
 func checkOneActionFlag(bools ...bool) bool {
