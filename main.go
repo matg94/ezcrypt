@@ -93,15 +93,15 @@ func main() {
 	flags := &Flags{}
 	actions := &Action{}
 
-	flag.StringVar(&flags.PublicKey, "pubkey", "./publicKey.pem", "Path to public key the default is ~/.ezcrypt/publicKey.pem. This path is relative to ~/.ezcrypt")
-	flag.StringVar(&flags.PrivateKey, "privkey", "./privateKey.pem", "Path to private key the default is ~/.ezcrypt/privateKey.pem. This path is relative to ~/.ezcrypt")
+	flag.StringVar(&flags.PublicKey, "pubkey", "./publicKey.pem", "Path to public key the default is ./publicKey.pem.")
+	flag.StringVar(&flags.PrivateKey, "privkey", "./privateKey.pem", "Path to private key the default is ./privateKey.pem.")
 	flag.StringVar(&flags.FilePath, "f", "", "Path to file to encrypt/decrypt, if not specified, piped string input will be encrypted")
 	flag.StringVar(&flags.Target, "t", "", "If specified, ezcrypt will create and overwrite a file at this path with its output")
 	flag.StringVar(&flags.SignatureFilePath, "s", "", "The filepath pointing to the signature file when verifying a signature")
 
 	flag.BoolVar(&actions.Encrypt, "enc", false, "Encrypt action mutually exclusive with other actions")
 	flag.BoolVar(&actions.Decrypt, "dec", false, "Decrypt action mutually exclusive with other actions")
-	flag.BoolVar(&actions.Generate, "gen", false, "Generate action used to generate keys: will overwrite default keys at ~/.ezcrypt/publicKey.pem and ~/.ezcrypt/privateKey.pem")
+	flag.BoolVar(&actions.Generate, "gen", false, "Generate action used to generate keys: will overwrite keys at ./publicKey.pem and ./privateKey.pem")
 	flag.BoolVar(&actions.Sign, "sign", false, "Signature action will create a signature for given input")
 	flag.BoolVar(&actions.Verify, "verify", false, "Will verify a signature given as input")
 
