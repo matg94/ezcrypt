@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -236,8 +235,6 @@ func TestDecryptActionFileToString(t *testing.T) {
 	}
 
 	DecryptAction(flags, "")
-
-	fmt.Println(buf.String())
 
 	if buf.String() == "" {
 		t.Log("expected output but did not get any")
