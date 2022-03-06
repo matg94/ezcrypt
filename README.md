@@ -8,62 +8,63 @@ Run `go install github.com/matg94/ezcrypt`
 
 ## Usage
 
-### Generating & Using Keys
+### Generating Keys
 
-Keys named `publicKey.pem` and `privateKey.pem` stored in `~/.ezcrypt` will be used by default.
-You can use ezcrypt to generate keys there, are you can provide your own.
+Keys need to be in the `.pem` format.
 
-Alternatively, you can use your own keys by passing the key path with the appropriate flag, i.e
-`-pubkey=<PATH/TO/PUBKEYFILE>` or `-privkey=<PATH/TO/PRIVKEYFILE>`
-The path will be relative to the `/.ezcrypt` directory, so keys placed in there just need to pass the filename.
-
-These need to be stored in the `.pem` format.
-
-To generate a new keypair in the default directory, use the following command
-`ezcrypt -gen`
-
-To generate a new keypair in a specific directory, use the `-pubkey` and `-privkey` fields.
-This will check for existing keys to avoid accidental overwrites.
+Keys can be generated using the `-gen` action. 
+Specifying the `-privkey=<path/to/file>` and `-pubkey=<path/to/file>` will generate the files at that location.
+The default is the current directory.
 
 `ezcrypt -gen -pubkey=<PATH/TO/NEWPUBKEY.pem> -privkey=<PATH/TO/NEWPRIVKEY.pem>`
 
-### Encryption
+### Encryption and Decryption
 
-#### String Encryption
+#### Encryption
 
-String encryption works by piping your string into ezcrypt.
+You can pipe a string directly into ezcrypt to encrypt it. The output will be given as standard output.
+for example,
+`echo "hello" | ezcrypt -enc`
 
-To encrypt a string, you can use the following command:
-`echo <string> | ezcrypt enc [-pubkey=/path/to/pubkey.pem]`
+Alternatively, you can get input by passing the `-f` flag to specify a file to read from.
 
-This will output the encrypted value.
+Flags:
+    * Adding a `-f <path/to/file>` flag will read from that file rather than standard input
+    * Adding a `-t <path/to/file>` flag will output to that path, rather than standard output
+    * Adding a `-pubkey=<path/to/file>` flag will use the key at the given path, rather than looking for one in the current directory
 
-#### File Encryption
+e.g
+`ezcrypt -enc -f ./fileToEncrypt -t ./encrytedFile -pubkey=/home/user/.ezcrypt/publicKey.pem`
+will encrypt `fileToEncrypt` into a new file `encryptedFile` using the specified public key.
 
-To encrypt a file, you can use the `-f` path.
-For example,
-`ezcrypt enc [-pubkey=/path/to/pubkey.pem] -f path/to/file [-t path/to/destinationfile]`
 
-A `-t` flag can be specified to set the target file manually, otherwise, it will override the original file
+#### Decryption
 
-### Decryption
+Decryption follows the same format as encryption, but with the `-dec` action.
 
-### String Decryption
-
-String decryption works by piping your string into ezcrypt.
-
-To decrypt a string, you can use the following command:
-`echo <string> | ezcrypt dec [-privkey=/path/to/privkey.pem]`
-
-This will output the decrypted value.
-
-### File Decryption
-
-To decrypt a file, you can use the `-f` flag to specify the filepath.
-The `-t` path is option, and will create the new decrypted file at that path. 
-For example,
-`ezcrypt dec [-pubkey=/path/to/pubkey.pem] -f path/to/file [-t path/to/destinationfile]`
-
-A `-t` flag can be specified to set the target file manually, otherwise, it will override the original file
+Flags:
+    * Adding a `-f <path/to/file>` flag will read from that file rather than standard input
+    * Adding a `-t <path/to/file>` flag will output to that path, rather than standard output
+    * Adding a `-privkey=<path/to/file>` flag will use the key at the given path, rather than looking for one in the current directory
 
 ### Signatures & Verification
+
+#### Signatures
+
+To sign a string or file with your private key, you can use the `-sign` action.
+You will need to provide the cipher to sign, either with standard in, or with the `-f` flag for a file.
+
+Flags:
+    * Adding a `-f <path/to/file>` flag will read from that file rather than standard input. This will read the body that needs to be signed
+    * Adding a `-t <path/to/file>` flag will output the signature to that path, rather than standard output
+    * Adding a `-privkey=<path/to/file>` flag will use the key at the given path, rather than looking for one in the current directory
+
+#### Verifying a Signature
+
+To verify a signature, use the `-verify` action.
+You will need to provide the signature using the `-s <path/to/file>` flag,
+and the body to verify, either using standard in, or the `-f <path/to/file>` flag.
+
+The command will either output `valid` or `invalid` based on the validity of the signature and body combination.
+
+A `pubkey=<path/to/pubkey>` flag needs to be provided, otherwise ezcrypt will look in the current directory for a `publicKey.pem` file.
